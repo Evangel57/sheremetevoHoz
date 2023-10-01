@@ -6,7 +6,7 @@ import random
 app = FastAPI()
 
 # Импорт подготовленного датасета
-dataset = pd.read_csv('df_finish.csv')
+dataset = pd.read_csv('df_finish_all_attr.csv')
 dataset = dataset[dataset.config > 0]
 
 def get_actions(float, cortege):
@@ -47,11 +47,11 @@ def processing(data: Data):
     # Добавляем для удобства сравнения при получении ответа
     res = {"real_stress": data.real_stress}
     # Среднее арифметическое  (наше математическое предсказание)
-    rate_mean = dataset[(dataset.hour==data.hour) & (dataset.minute==data.minutes)].rate.mean() 
+    rate_mean = dataset[(dataset.hour==data.hour) & (dataset.minute==data.minutes) & (dataset.day_of_the_week == data.week_day)].rate.mean() 
     res['my_pred_stress'] = rate_mean
 
     # Стандартное отклонение
-    diff = dataset[(dataset.hour==data.hour) & (dataset.minute==data.minutes)].rate.std()
+    diff = dataset[(dataset.hour==data.hour) & (dataset.minute==data.minutes) & (dataset.day_of_the_week == data.week_day)].rate.std()
 
     # Если отклонение больше среднего абсолютного, то предупреждаем и в потенциале при помощи обучения нейронной сети на новых данных по загрузкам терминалов - можно получить советы как поступить
     if rate_mean + diff < data.real_stress:
